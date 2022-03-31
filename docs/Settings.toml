@@ -1,0 +1,14 @@
+# these are the default settings, and explinations
+
+# the name of the booru site, 
+name = "homebooru"
+path = "./data"
+# error, warn, info, or debug
+log_level = "debug"
+
+[server]
+port = 8080
+bind = [ "0.0.0.0", "10.0.0.10" ]
+
+[database]
+url = "mongodb://10.0.0.2"
