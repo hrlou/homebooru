@@ -1,12 +1,9 @@
 use yew::prelude::*;
+pub mod components;
 
-#[function_component(App)]
-fn app() -> Html {
-    html! {
-        <h1>{ "Hello, World!" }</h1>
-    }
-}
+// use super::{request_get, request_post, request_put};
+// request_get
 
 fn main() {
-    yew::start_app::<App>();
+    yew::start_app::<components::login::Model>();
 }

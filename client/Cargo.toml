@@ -7,7 +7,16 @@ keywords = ["client", "wasm"]
 edition = "2021"
 
 [dependencies]
-yew = "0.19.3"
-reqwasm = "0.2"
-serde = { version = "1.0", features = ["derive"] }
-wasm-bindgen-futures = "0.4"
+yew = { version = "^0.19" }
+yew-router = "^0"
+# reqwest-wasm = "0.11.0"
+reqwasm = "0.5.0"
+serde = { version = "^1", features = ["derive"] }
+serde_json = "^1"
+lazy_static = "^1"
+wasm-bindgen = "^0"
+wasm-bindgen-futures = "^0"
+web-sys = "^0"
+
+# [lib]
+# crate-type = ["rlib", "cdylib"]

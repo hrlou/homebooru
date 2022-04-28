@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="Sqlite" id="Project-1b43" database="Sqlite" >
+	<schema name="Default" >
+		<table name="media" prior="table" >
+			<column name="md5" type="VARCHAR" length="127" jt="12" mandatory="y" >
+				<comment><![CDATA[MD5 hash of the original file]]></comment>
+			</column>
+			<column name="name" type="VARCHAR" length="255" jt="12" mandatory="y" />
+			<column name="mime" type="VARCHAR" length="127" jt="12" mandatory="y" />
+			<index name="pk_media" unique="PRIMARY_KEY" >
+				<column name="md5" />
+			</index>
+		</table>
+		<table name="post" generator_rows="100" >
+			<column name="id" type="INTEGER" jt="4" mandatory="y" />
+			<column name="owner_id" type="INTEGER" jt="4" mandatory="y" />
+			<column name="source" type="VARCHAR" length="255" jt="12" />
+			<column name="title" type="VARCHAR" length="255" jt="12" />
+			<column name="creation" type="DATETIME" jt="93" mandatory="y" >
+				<defo><![CDATA[CURRENT_TIMESTAMP]]></defo>
+			</column>
+			<index name="pk_post" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_post_user" to_schema="Default" to_table="user" >
+				<fk_column name="owner_id" pk="id" />
+			</fk>
+		</table>
+		<table name="post_page" prior="table" >
+			<column name="page" prior="index" type="INTEGER" jt="4" mandatory="y" />
+			<column name="post_id" type="INTEGER" jt="4" mandatory="y" />
+			<column name="page_id" type="VARCHAR" length="127" jt="12" mandatory="y" />
+			<index name="pk_post_page" unique="PRIMARY_KEY" >
+				<column name="page" />
+				<column name="post_id" />
+			</index>
+			<index name="uq_post_page" unique="UNIQUE_KEY" >
+				<column name="page" />
+				<column name="post_id" />
+				<column name="page_id" />
+			</index>
+			<fk name="fk_post_page_post" to_schema="Default" to_table="post" delete_action="cascade" update_action="cascade" >
+				<fk_column name="post_id" pk="id" />
+			</fk>
+			<fk name="fk_post_page_tag" to_schema="Default" to_table="media" >
+				<fk_column name="page_id" pk="md5" />
+			</fk>
+		</table>
+		<table name="post_tag" generator_rows="150" spec="" >
+			<column name="post_id" type="INTEGER" jt="4" mandatory="y" />
+			<column name="tag_id" type="INTEGER" jt="4" mandatory="y" />
+			<index name="pk_post_tag" unique="PRIMARY_KEY" >
+				<column name="post_id" />
+				<column name="tag_id" />
+			</index>
+			<fk name="fk_post_tag_post" to_schema="Default" to_table="post" delete_action="cascade" update_action="cascade" >
+				<fk_column name="post_id" pk="id" />
+			</fk>
+			<fk name="fk_post_tag_tag" to_schema="Default" to_table="tag" >
+				<fk_column name="tag_id" pk="id" />
+			</fk>
+		</table>
+		<table name="tag" generator_rows="100" >
+			<column name="id" type="INTEGER" jt="4" mandatory="y" />
+			<column name="kind" type="VARCHAR" length="255" jt="12" mandatory="y" />
+			<column name="name" type="VARCHAR" length="255" jt="12" mandatory="y" />
+			<index name="pk_tag" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="uq_kind_name" unique="UNIQUE_KEY" >
+				<column name="kind" />
+				<column name="name" />
+			</index>
+		</table>
+		<table name="user" >
+			<column name="id" type="INTEGER" jt="4" mandatory="y" />
+			<column name="username" type="VARCHAR" length="127" jt="12" mandatory="y" />
+			<column name="email" type="VARCHAR" length="255" jt="12" mandatory="y" />
+			<column name="hash" type="VARCHAR" length="255" jt="12" mandatory="y" />
+			<column name="creation" type="DATETIME" jt="93" mandatory="y" >
+				<defo><![CDATA[CURRENT_TIMESTAMP]]></defo>
+			</column>
+			<index name="pk_user" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="uq_user" unique="UNIQUE_KEY" >
+				<column name="username" />
+				<column name="email" />
+			</index>
+		</table>
+	</schema>
+	<connector name="Sqlite" database="Sqlite" driver_class="org.sqlite.JDBC" driver_jar="sqlite-jdbc-3.36.0.3.jar" driver_desc="Standard" host="localhost" port="7210" instance="C:/Users/hess2/OneDrive/Programming/homebooru/data/db/homebooru.db" />
+	<layout name="Main Layout" id="Layout-fcc" show_relation="columns" >
+		<entity schema="Default" name="media" color="C1D8EE" x="688" y="192" />
+		<entity schema="Default" name="post" color="C1D8EE" x="288" y="96" />
+		<entity schema="Default" name="post_page" color="C1D8EE" x="496" y="192" />
+		<entity schema="Default" name="post_tag" color="3986C1" x="496" y="64" />
+		<entity schema="Default" name="tag" color="C1D8EE" x="688" y="48" />
+		<entity schema="Default" name="user" color="C1D8EE" x="48" y="96" />
+		<script name="post_tag" id="Editor-1ed7" language="SQL" >
+			<string><![CDATA[SELECT post_id, tag_id
+FROM
+	post_tag g;]]></string>
+		</script>
+		<browser id="Browse-1121" name="post" confirm_updates="y" confirmed="y" >
+			<browse_table schema="Default" entity="post" x="20" y="20" width="400" height="300" />
+		</browser>
+		<browser id="Browse-f02" name="tag" confirm_updates="y" confirmed="y" >
+			<browse_table schema="Default" entity="tag" x="659" y="33" width="400" height="300" />
+		</browser>
+	</layout>
+</project>

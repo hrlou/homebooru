@@ -1,5 +1,8 @@
 [build]
 target = "client/index.html"
 release = true
-dist = "target/dist"
+dist = "www/dist"
 public_url = "/"
+
+[tools]
+sass = "1.50.0"
