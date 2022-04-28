@@ -16,4 +16,4 @@ Cargo.lock
 .vscode/
 data/db/*.db*
 imager/tests
-www/dist/*.*
+www/dist/*.{html,js,css,wasm}
