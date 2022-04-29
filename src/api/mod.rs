@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod user;
+pub mod post;
 
 pub mod prelude {
     pub use crate::{db::prelude::*, error::ServiceError};

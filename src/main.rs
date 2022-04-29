@@ -28,17 +28,23 @@ pub async fn info(id: ActixIdentity) -> Result<HttpResponse, ServiceError> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    std::env::set_var(
+        "RUST_LOG",
+        "homebooru=debug,actix_web=info,actix_server=info",
+    );
+    env_logger::init();
+
     let state = AppState {
         conn: sea_orm::Database::connect("sqlite:data/db/homebooru.db").await?
     };
 
-    User::create(&state.conn, 
+    /*User::create(&state.conn, 
         "hrlou".into(), 
         "hesslewis@gmail.com".into(), 
         "password".into()
-    ).await?;
+    ).await.unwrap();
 
-    /*let tags: Vec<(String, String)> = vec![
+    let tags: Vec<(String, String)> = vec![
         ("parody".into(), "genshin impact".into()),
         ("character".into(), "keqing".into()),
         ("artist".into(), "remana".into()),
@@ -46,20 +52,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Post::create(&state.conn, tags, post::ActiveModel {
         title: Set(Some("[MANA] 刻晴1".into())),
         source: Set(Some("https://exhentai.org/g/2202032/f8252001bf".into())),
+        owner_id: Set(1),
         ..Default::default()
     }).await?;*/
 
-    std::env::set_var(
-        "RUST_LOG",
-        "homebooru=debug,actix_web=info,actix_server=info",
-    );
-    env_logger::init();
     // override with config
-    let domain = "localhost".to_string();
+    // let posts = Post::find()
+    //     .find_with_related(Tag)
+    //     .all(&state.conn)
+    //     .await?;
+    // println!("{:?}", posts);
 
-
-
-    
+    let domain = "localhost".to_string();    
 
     HttpServer::new(move || {
         App::new()
@@ -77,15 +81,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             ))
             .service(web::scope("/api")
                 .route("", web::get().to(info))
-                .service(
-                    web::resource("/auth")
-                        .route(web::post().to(api::auth::login))
-                        .route(web::delete().to(api::auth::logout))
-                        .route(web::get().to(api::auth::get)),
+                .service(web::resource("/auth")
+                    .route(web::post().to(api::auth::login))
+                    .route(web::delete().to(api::auth::logout))
+                    .route(web::get().to(api::auth::get)),
+                )
+                .service(web::resource("/post/{id}")
+                    .route(web::get().to(api::post::get)),
                 )
             )
             .service(actix_files::Files::new("/assets", "www/assets/").show_files_listing())
-            .service(actix_files::Files::new("/", "www/dist/").index_file("index.html"))
+            .service(actix_files::Files::new("/", "www/app/").index_file("index.html"))
             .default_service(web::to(|| HttpResponse::NotFound()))
             // .default_service(web::to(|| HttpResponse::Found().append_header(("Location", "/")).finish()))
 

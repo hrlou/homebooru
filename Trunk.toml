@@ -1,8 +1,20 @@
 [build]
 target = "client/index.html"
 release = true
-dist = "www/dist"
+dist = "www/app"
 public_url = "/"
+
+[serve]
+addr = "127.0.0.1"
+port = 9000
+open = false
+no_autoreload = false
 
 [tools]
 sass = "1.50.0"
+wasm_bindgen = "0.2.80"
+wasm_opt = "version_105"
+
+[[proxy]]
+rewrite = "/"
+backend = "http://localhost:8080/"

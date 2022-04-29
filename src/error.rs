@@ -1,12 +1,13 @@
 use actix_web::{error::ResponseError, HttpResponse};
-use derive_more::{Display, Error};
+use derive_more::{Display};
 use sea_orm::DbErr;
+// derive_more::Error
 
-#[derive(Debug, Display, Error)]
+#[derive(Debug, Display)]
 pub enum ServiceError {
     #[display(fmt = "Internal Server Error")]
     InternalServerError,
-
+    
     #[display(fmt = "BadRequest: {}", _0)]
     BadRequest(String),
 
@@ -14,7 +15,6 @@ pub enum ServiceError {
     Unauthorized,
 }
 
-// impl ResponseError trait allows to convert our errors into http responses with appropriate data
 impl ResponseError for ServiceError {
     fn error_response(&self) -> HttpResponse {
         match self {
@@ -30,5 +30,11 @@ impl ResponseError for ServiceError {
 impl From<DbErr> for ServiceError {
     fn from(_: DbErr) -> ServiceError {
         ServiceError::BadRequest("Database Error".into())
+    }
+}
+
+impl From<actix_web::Error> for ServiceError {
+    fn from(_: actix_web::Error) -> ServiceError {
+        ServiceError::BadRequest("Server Error".into())
     }
 }

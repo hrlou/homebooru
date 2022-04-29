@@ -69,6 +69,17 @@ impl Post {
         }
         Ok(id)
     }
+
+    pub async fn get(conn: &DatabaseConnection, post: i32) -> Result<(post::Model, Vec<tag::Model>), ServiceError> {
+        if let Some(post) = Post::find_by_id(post)
+            .one(conn)
+            .await?
+        {
+            let tags = post.find_related(Tag).all(conn).await?;
+            return Ok((post, tags));
+        }
+        Err(ServiceError::BadRequest("No such post".into()))
+    }
     
     pub async fn add_tag(conn: &DatabaseConnection, post: i32, tag: (String, String)) -> Result<(), Box<dyn std::error::Error>> {
         let id = Tag::create(conn, tag).await?;
@@ -94,7 +105,10 @@ impl User {
                 let id = user.last_insert_id;
                 Ok(id)
             }
-            _ => Err(ServiceError::BadRequest("cannot create user".into()))
+            Err(e) => {
+                log::error!("{:?}", e);
+                Err(ServiceError::BadRequest("cannot create user".into()))
+            }
         }   
     }
 }

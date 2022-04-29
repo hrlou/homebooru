@@ -1,0 +1,17 @@
+name = "homebooru" # application name
+path = "./data" # location to save data
+log = "debug" # error, warn, info, or debug
+
+[server]
+port = 8080
+bind = [ "0.0.0.0", "10.0.0.10" ]
+domain = "localhost"
+
+[ssl]
+enable = false
+
+[database]
+url = "sqlite:data/db/homebooru.db"
+
+[client]
+enable = true

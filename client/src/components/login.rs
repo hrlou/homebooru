@@ -1,18 +1,26 @@
+use reqwasm::http::{Request, Response};
+use serde::{Serialize, Deserialize};
+use wasm_bindgen_futures::spawn_local;
+use wasm_bindgen::prelude::*;
 use web_sys::HtmlInputElement;
 // use yew::html::InputData;
 use yew::prelude::*;
 use yew_router::utils::fetch_base_url;
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Model {
-    pub value: i64,
+    pub login: String,
     pub password: String,
-    pub email: String,
 }
+
+// #[derive(Debug, Serialize)]
+// pub struct Lo
 
 pub enum Msg {
     Login,
+    Logout,
     PasswordUpdate(String),
-    EmailUpdate(String),
+    LoginUpdate(String),
 }
 
 impl Component for Model {
@@ -21,24 +29,35 @@ impl Component for Model {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            value: 0,
+            login: String::new(),
             password: String::new(),
-            email: String::new(),
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Login => {
-                // self.value += 1;
+                let body = serde_json::ser::to_string(&self).unwrap();
+                spawn_local(async move {
+                    Request::post("http://localhost:8080/api/auth")
+                        .body(body)
+                        .header("Content-Type", "application/json")
+                        .send().await.unwrap();
+                });
+                true
+            }
+            Msg::Logout => {
+                spawn_local(async move {
+                    Request::delete("http://localhost:8080/api/auth").send().await.unwrap();
+                });
                 true
             }
             Msg::PasswordUpdate(s) => {
                 self.password = s;
                 true
             }
-            Msg::EmailUpdate(s) => {
-                self.email = s;
+            Msg::LoginUpdate(s) => {
+                self.login = s;
                 true
             }
         }
@@ -51,16 +70,16 @@ impl Component for Model {
         html! {
             <div class="login">
             <h1>{ "Login" }</h1>
-            <p>{ "Please enter your email and password" }</p>
+            <p>{ "Please enter your login and password" }</p>
             // <input class="field" type="password" placeholder="Password" id="password"/>
             <input class="field"
                 type="text"
-                placeholder="email"
-                id="email"
-                value={self.email.clone()}
+                placeholder="login"
+                id="login"
+                value={self.login.clone()}
                 oninput={link.callback(|e: InputEvent| {
                     let s: String = e.target_unchecked_into::<HtmlInputElement>().value();
-                    Msg::EmailUpdate(s)
+                    Msg::LoginUpdate(s)
                 })}
             />
             <input class="field" type="password" placeholder="Password" id="password"
@@ -71,6 +90,7 @@ impl Component for Model {
                 })}
             />
             <button class="btn" onclick={link.callback(|_| Msg::Login)}>{ "Sign in" }</button>
+            <button class="btn" onclick={link.callback(|_| Msg::Logout)}>{ "Sign Out" }</button>
             </div>
         }
     }
