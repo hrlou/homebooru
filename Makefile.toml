@@ -1,0 +1,74 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+SQLITE_CMD = "sqlite3"
+DATABASE = "data/db/homebooru.db"
+DATABASE_URL = "sqlite:${DATABASE}"
+ENTITY = "src/db/entity"
+SQL_UP = "docs/schema/sql/up.sql"
+SQL_DOWN = "docs/schema/sql/down.sql"
+
+[config]
+default_to_workspace = false
+init_task = "build"
+# end_task = "end"
+
+[tasks.build-data]
+script = '''
+mkdir -p data/db
+'''
+
+[tasks.default]
+dependencies = [ "build" ]
+
+# build
+[tasks.build-client]
+command = "trunk"
+args = [ "build" ]
+
+[tasks.build-server]
+command = "cargo"
+args = [ "build" ]
+
+[tasks.build]
+dependencies = [ "build-client", "build-server" ]
+
+# run
+[tasks.run-client]
+command = "trunk"
+args = [ "watch" ]
+
+[tasks.run-server]
+command = "cargo"
+args = [ "run" ]
+
+[tasks.run]
+run_task = [
+    { name = ["run-client", "run-server"], parallel = true },
+]
+
+# codegen
+[tasks.entity]
+command = "sea-orm-cli"
+args = [ "generate", "entity", "-o", "${ENTITY}", "-s", "${SQL_UP}", "--with-serde", "both" ]
+
+# sql
+[tasks.down]
+command = "${SQLITE_CMD}"
+args = [ "${DATABASE}", ".read ${SQL_DOWN}", ".exit" ]
+
+[tasks.up]
+command = "${SQLITE_CMD}"
+args = [ "${DATABASE}", ".read ${SQL_UP}", ".exit" ]
+dependencies = [ "down" ]
+
+# clean
+[tasks.clean-client]
+command = "trunk"
+args = [ "clean" ]
+
+[tasks.clean-server]
+command = "cargo"
+args = [ "clean" ]
+
+[tasks.clean]
+dependencies = [ "clean-client", "clean-server" ]

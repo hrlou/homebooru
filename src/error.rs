@@ -1,5 +1,5 @@
 use actix_web::{error::ResponseError, HttpResponse};
-use derive_more::{Display};
+use derive_more::Display;
 use sea_orm::DbErr;
 // derive_more::Error
 
@@ -7,7 +7,7 @@ use sea_orm::DbErr;
 pub enum ServiceError {
     #[display(fmt = "Internal Server Error")]
     InternalServerError,
-    
+
     #[display(fmt = "BadRequest: {}", _0)]
     BadRequest(String),
 

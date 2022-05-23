@@ -18,7 +18,11 @@ struct PostInput {
     source: Option<String>,
 }
 
-pub async fn get(path: web::Path<i32>, user: user::Model, state: web::Data<AppState>) -> Result<HttpResponse, ServiceError> {
+pub async fn get(
+    path: web::Path<i32>,
+    user: user::Model,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, ServiceError> {
     let post = path.into_inner();
     let (post, tags) = Post::get(&state.conn, post).await?;
     let output = PostOutput { post, tags };

@@ -17,10 +17,8 @@ pub fn hash(password: &str) -> Result<String, ServiceError> {
 }
 
 pub fn verify(hash: &str, password: &str) -> Result<bool, ServiceError> {
-    argon2::verify_encoded(hash, password.as_bytes()).map_err(
-        |err| {
-            dbg!(err);
-            ServiceError::Unauthorized
-        },
-    )
+    argon2::verify_encoded(hash, password.as_bytes()).map_err(|err| {
+        dbg!(err);
+        ServiceError::Unauthorized
+    })
 }

@@ -1,7 +1,7 @@
 use reqwasm::http::{Request, Response};
-use serde::{Serialize, Deserialize};
-use wasm_bindgen_futures::spawn_local;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
+use wasm_bindgen_futures::spawn_local;
 use web_sys::HtmlInputElement;
 // use yew::html::InputData;
 use yew::prelude::*;
@@ -42,13 +42,18 @@ impl Component for Model {
                     Request::post("http://localhost:8080/api/auth")
                         .body(body)
                         .header("Content-Type", "application/json")
-                        .send().await.unwrap();
+                        .send()
+                        .await
+                        .unwrap();
                 });
                 true
             }
             Msg::Logout => {
                 spawn_local(async move {
-                    Request::delete("http://localhost:8080/api/auth").send().await.unwrap();
+                    Request::delete("http://localhost:8080/api/auth")
+                        .send()
+                        .await
+                        .unwrap();
                 });
                 true
             }
@@ -62,7 +67,7 @@ impl Component for Model {
             }
         }
     }
-    
+
     fn view(&self, ctx: &Context<Self>) -> Html {
         // This gives us a component's "`Scope`" which allows us to send messages, etc to the component.
         let link = ctx.link();

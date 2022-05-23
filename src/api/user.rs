@@ -1,5 +1,8 @@
 use crate::api::prelude::*;
-use tokio::{macros::support::{Pin, Future}, sync::RwLock};
+use tokio::{
+    macros::support::{Future, Pin},
+    sync::RwLock,
+};
 
 impl FromRequest for user::Model {
     type Error = ServiceError;
@@ -15,7 +18,7 @@ impl FromRequest for user::Model {
         Box::pin(async move {
             if let Some(id) = id.identity() {
                 let user: user::Model = serde_json::from_str(id.as_str()).unwrap();
-                return Ok(user)
+                return Ok(user);
             };
             Err(Self::Error::BadRequest("unauthorized".into()))
         })

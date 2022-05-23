@@ -8,5 +8,4 @@ Cargo.lock
 
 .vscode/
 data/db/*.db*
-imager/tests
 www/app

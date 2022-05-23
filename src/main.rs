@@ -1,21 +1,21 @@
 //! Homebooru, the homebrew booru site
 //!
-//! A booru is a tagged image board, here is an 
+//! A booru is a tagged image board, here is an
 //! [`example`](https://safebooru.org/)
-//! 
+//!
 //! This project aims to write a booru server in rust for personal home use
 //!
 
 // use std::env;
 
-pub mod auth;
 pub mod api;
+pub mod auth;
 pub mod db;
 pub mod error;
 // pub mod entity;
 
-use db::prelude::*;
 use api::prelude::*;
+use db::prelude::*;
 
 #[derive(Debug, Clone)]
 pub struct AppState {
@@ -35,12 +35,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
 
     let state = AppState {
-        conn: sea_orm::Database::connect("sqlite:data/db/homebooru.db").await?
+        conn: sea_orm::Database::connect("sqlite:data/db/homebooru.db").await?,
     };
 
-    /*User::create(&state.conn, 
-        "hrlou".into(), 
-        "hesslewis@gmail.com".into(), 
+    /*User::create(&state.conn,
+        "hrlou".into(),
+        "hesslewis@gmail.com".into(),
         "password".into()
     ).await.unwrap();
 
@@ -63,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //     .await?;
     // println!("{:?}", posts);
 
-    let domain = "localhost".to_string();    
+    let domain = "localhost".to_string();
 
     HttpServer::new(move || {
         App::new()
@@ -79,22 +79,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .same_site(actix_web::cookie::SameSite::Strict)
                     .secure(false), // this can only be true if you have https
             ))
-            .service(web::scope("/api")
-                .route("", web::get().to(info))
-                .service(web::resource("/auth")
-                    .route(web::post().to(api::auth::login))
-                    .route(web::delete().to(api::auth::logout))
-                    .route(web::get().to(api::auth::get)),
-                )
-                .service(web::resource("/post/{id}")
-                    .route(web::get().to(api::post::get)),
-                )
+            .service(
+                web::scope("/api")
+                    .route("", web::get().to(info))
+                    .service(
+                        web::resource("/auth")
+                            .route(web::post().to(api::auth::login))
+                            .route(web::delete().to(api::auth::logout))
+                            .route(web::get().to(api::auth::get)),
+                    )
+                    .service(web::resource("/post/{id}").route(web::get().to(api::post::get))),
             )
             .service(actix_files::Files::new("/assets", "www/assets/").show_files_listing())
             .service(actix_files::Files::new("/", "www/app/").index_file("index.html"))
             .default_service(web::to(|| HttpResponse::NotFound()))
-            // .default_service(web::to(|| HttpResponse::Found().append_header(("Location", "/")).finish()))
-
+        // .default_service(web::to(|| HttpResponse::Found().append_header(("Location", "/")).finish()))
     })
     .bind(("0.0.0.0", 8080))?
     .run()

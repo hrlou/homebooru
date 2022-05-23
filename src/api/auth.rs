@@ -6,7 +6,11 @@ pub struct AuthData {
     pub password: String,
 }
 
-pub async fn login(auth: web::Json<AuthData>, id: ActixIdentity, state: web::Data<AppState>) -> Result<HttpResponse, ServiceError> {
+pub async fn login(
+    auth: web::Json<AuthData>,
+    id: ActixIdentity,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, ServiceError> {
     let auth = auth.into_inner();
     let user: user::Model = query(&auth, state).await?;
     let user_string = serde_json::to_string(&user).unwrap();
@@ -29,8 +33,11 @@ pub async fn get(id: ActixIdentity) -> HttpResponse {
 
 async fn query(auth: &AuthData, state: web::Data<AppState>) -> Result<user::Model, ServiceError> {
     let user = User::find()
-        .filter(user::Column::Email.eq(auth.login.clone())
-            .or(user::Column::Username.eq(auth.login.clone())))
+        .filter(
+            user::Column::Email
+                .eq(auth.login.clone())
+                .or(user::Column::Username.eq(auth.login.clone())),
+        )
         .one(&state.conn)
         .await?;
     if let Some(user) = user {
