@@ -7,7 +7,6 @@ use tokio::{
 impl FromRequest for user::Model {
     type Error = ServiceError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
-    // type Future = Future<Box<dyn Output = Result<Self, Self::Error>>;
 
     fn from_request(req: &HttpRequest, pl: &mut Payload) -> Self::Future {
         let id = ActixIdentity::from_request(req, pl).into_inner();

@@ -1,18 +1,7 @@
-//! Homebooru, the homebrew booru site
-//!
-//! A booru is a tagged image board, here is an
-//! [`example`](https://safebooru.org/)
-//!
-//! This project aims to write a booru server in rust for personal home use
-//!
-
-// use std::env;
-
 pub mod api;
 pub mod auth;
 pub mod db;
 pub mod error;
-// pub mod entity;
 
 use api::prelude::*;
 use db::prelude::*;
@@ -28,40 +17,11 @@ pub async fn info(id: ActixIdentity) -> Result<HttpResponse, ServiceError> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    std::env::set_var(
-        "RUST_LOG",
-        "homebooru=debug,actix_web=info,actix_server=info",
-    );
     env_logger::init();
 
     let state = AppState {
         conn: sea_orm::Database::connect("sqlite:data/db/homebooru.db").await?,
     };
-
-    /*User::create(&state.conn,
-        "hrlou".into(),
-        "hesslewis@gmail.com".into(),
-        "password".into()
-    ).await.unwrap();
-
-    let tags: Vec<(String, String)> = vec![
-        ("parody".into(), "genshin impact".into()),
-        ("character".into(), "keqing".into()),
-        ("artist".into(), "remana".into()),
-    ];
-    Post::create(&state.conn, tags, post::ActiveModel {
-        title: Set(Some("[MANA] 刻晴1".into())),
-        source: Set(Some("https://exhentai.org/g/2202032/f8252001bf".into())),
-        owner_id: Set(1),
-        ..Default::default()
-    }).await?;*/
-
-    // override with config
-    // let posts = Post::find()
-    //     .find_with_related(Tag)
-    //     .all(&state.conn)
-    //     .await?;
-    // println!("{:?}", posts);
 
     let domain = "localhost".to_string();
 
@@ -93,7 +53,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .service(actix_files::Files::new("/assets", "www/assets/").show_files_listing())
             .service(actix_files::Files::new("/", "www/app/").index_file("index.html"))
             .default_service(web::to(|| HttpResponse::NotFound()))
-        // .default_service(web::to(|| HttpResponse::Found().append_header(("Location", "/")).finish()))
     })
     .bind(("0.0.0.0", 8080))?
     .run()

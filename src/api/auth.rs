@@ -25,9 +25,6 @@ pub async fn logout(id: ActixIdentity) -> Result<HttpResponse, ServiceError> {
 }
 
 pub async fn get(id: ActixIdentity) -> HttpResponse {
-    // id.identity()
-    // let id: &str = &id.identity().unwrap()[..];
-    // let id = serde_json::from_str(id).unwrap();
     HttpResponse::Ok().json(id.identity())
 }
 

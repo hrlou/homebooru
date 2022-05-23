@@ -7,5 +7,8 @@ Cargo.lock
 *.pdb
 
 .vscode/
-data/db/*.db*
 www/app
+
+# data
+data/db/*.db*
+data/files

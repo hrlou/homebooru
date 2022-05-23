@@ -1,5 +1,7 @@
 [env]
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+RUST_LOG = "homebooru=debug,actix_web=info,actix_server=info"
+# ----
 SQLITE_CMD = "sqlite3"
 DATABASE = "data/db/homebooru.db"
 DATABASE_URL = "sqlite:${DATABASE}"
@@ -11,6 +13,11 @@ SQL_DOWN = "docs/schema/sql/down.sql"
 default_to_workspace = false
 init_task = "build"
 # end_task = "end"
+
+[tasks.format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--emit=files"]
 
 [tasks.build-data]
 script = '''
@@ -48,6 +55,7 @@ run_task = [
 
 # codegen
 [tasks.entity]
+# install_crate = "sea-orm-cli"
 command = "sea-orm-cli"
 args = [ "generate", "entity", "-o", "${ENTITY}", "-s", "${SQL_UP}", "--with-serde", "both" ]
 
